@@ -11,7 +11,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/DouglasLira-Dev/stock-manager-api?style=flat-square)](https://github.com/DouglasLira-Dev/stock-manager-api/releases)
 [![GitHub last commit](https://img.shields.io/github/last-commit/DouglasLira-Dev/stock-manager-api?style=flat-square)](https://github.com/DouglasLira-Dev/stock-manager-api/commits/main)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-17%20passed-brightgreen?style=flat-square)](#)
+[![Tests](https://img.shields.io/badge/Tests-20%20passed-brightgreen?style=flat-square)](#)
 
 </div>
 
@@ -23,7 +23,7 @@ API REST para controle de inventário/estoque, desenvolvida como projeto de port
 
 ---
 
-## ✨ Funcionalidades (v1.3.0)
+## ✨ Funcionalidades (v2.1.0)
 
 ### 🔐 Autenticação e Segurança
 - ✅ Cadastro e login de usuários com JWT (stateless)
@@ -35,6 +35,13 @@ API REST para controle de inventário/estoque, desenvolvida como projeto de port
 - ✅ Regras de negócio: Entrada e Saída de Estoque (com validação de quantidade negativa)
 - ✅ Listagem de produtos com estoque baixo (< 5 unidades)
 - ✅ Paginação e filtros por categoria e nome
+- ✅ Listagem de categorias únicas (`GET /api/categories`)
+- ✅ Controle de estoque mínimo por produto
+- ✅ Listagem de produtos abaixo do mínimo definido (`GET /api/products/below-minimum`)
+
+### 📊 Histórico e Estatísticas
+- ✅ Histórico completo de movimentações (ENTRY/EXIT) com paginação (`GET /api/movimentations`)
+- ✅ Estatísticas do estoque: total de produtos, valor total, estoque baixo e zerado (`GET /api/products/stats`)
 
 ### 📚 Documentação e Monitoramento
 - ✅ Documentação interativa com Swagger/OpenAPI
@@ -42,7 +49,7 @@ API REST para controle de inventário/estoque, desenvolvida como projeto de port
 
 ### 🧪 Qualidade e Testes
 - ✅ Tratamento global de exceções
-- ✅ 17 testes unitários (AuthService e ProductService)
+- ✅ 20 testes unitários (AuthService e ProductService)
 - ✅ Código em camadas (Controller → Service → Repository)
 
 ---
@@ -79,7 +86,7 @@ src/
 └── test/
 └── java/com/estoque/api/service/
 ├── AuthServiceTest.java # 5 testes
-└── ProductServiceTest.java # 12 testes
+└── ProductServiceTest.java # 15 testes
 ```
 
 
@@ -134,6 +141,20 @@ mvn test
 | PATCH | `/api/products/{id}/stock/remove` | Saída de estoque (remover com validação) | JWT (Bearer) |
 | GET | `/api/products/low-stock` | Listar produtos com estoque baixo (< 5) | JWT (Bearer) |
 
+### 📊 Estatísticas e Categorias
+
+| Método | Endpoint | Descrição | Autenticação |
+|--------|----------|-----------|---------------|
+| GET | `/api/products/stats` | Estatísticas do estoque (total, valor, baixo, zerado) | JWT (Bearer) |
+| GET | `/api/categories` | Listar categorias únicas do usuário | JWT (Bearer) |
+| GET | `/api/products/below-minimum` | Listar produtos com estoque abaixo do mínimo | JWT (Bearer) |
+
+### 📜 Histórico de Movimentações
+
+| Método | Endpoint | Descrição | Autenticação |
+|--------|----------|-----------|---------------|
+| GET | `/api/movimentations` | Histórico completo de entrada/saída de estoque (com paginação) | JWT (Bearer) |
+
 ### 📊 Monitoramento
 
 | Método | Endpoint | Descrição | Autenticação |
@@ -155,12 +176,16 @@ A interface permite:
 
 ## 🧪 Testes
 
-O projeto conta com 17 testes unitários:
+O projeto conta com **20 testes unitários**:
 
 | Classe de Teste | Quantidade | Cenários |
 |------------------|------------|----------|
-| AuthServiceTest | 5 testes | Registro, login, validações |
-| ProductServiceTest | 12 testes | CRUD, regras de estoque, filtros |
+| `AuthServiceTest` | 5 testes | Registro, login, validações |
+| `ProductServiceTest` | 15 testes | CRUD, regras de estoque, filtros, estatísticas, históricos |
+
+```bash
+# Executar todos os testes
+mvn test
 
 ```bash
 # Executar todos os testes
