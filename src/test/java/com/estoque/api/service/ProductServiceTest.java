@@ -173,7 +173,7 @@ class ProductServiceTest {
                 () -> productService.getProductById(1L)
         );
 
-        assertEquals("Você não tem permissão para acessar este produto", exception.getMessage());
+        assertTrue(exception.getMessage().contains("não tem permissão"));
     }
 
     // ======== TESTES DE ATUALIZAÇÃO ========

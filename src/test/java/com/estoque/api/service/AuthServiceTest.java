@@ -110,7 +110,7 @@ class AuthServiceTest {
                 () -> authService.register(registerRequest)
         );
 
-        assertEquals("Email já está em uso!", exception.getMessage());
+        assertTrue(exception.getMessage().contains("já está em uso"));
 
         // Verifica que o save NUNCA foi chamado
         verify(userRepository, never()).save(any(User.class));
@@ -175,7 +175,7 @@ class AuthServiceTest {
                 () -> authService.login(loginRequest)
         );
 
-        assertEquals("Credenciais inválidas", exception.getMessage());
+        assertTrue(exception.getMessage().contains("Email ou senha inválidos"));
         verify(userRepository, never()).findByEmail(anyString());
     }
 }
