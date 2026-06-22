@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,6 +30,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final MovimentationService movimentationService;
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     public ProductService(ProductRepository productRepository,
                             UserRepository userRepository,
@@ -47,6 +50,7 @@ public class ProductService {
     // 1. Criar produto
     public ProductResponseDTO createProduct(ProductRequestDTO dto) {
         User user = getAuthenticatedUser();
+        logger.info("Usuário {} criando novo produto: {}", user.getEmail(), dto.name());
 
         Product product = new Product();
         product.setName(dto.name());
@@ -58,6 +62,7 @@ public class ProductService {
         product.setMinimumQuantity(dto.minimumQuantity() != null ? dto.minimumQuantity() : 0); // Define quantidade mínima, default 0
 
         Product saved = productRepository.save(product);
+        logger.info("Produto criado com sucesso: {} (ID: {})", saved.getName());
         return mapToResponseDTO(saved);
 
     }
@@ -98,10 +103,14 @@ public class ProductService {
     // 4. Atualizar produto
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
         User user = getAuthenticatedUser();
+        logger.info("Usuário {} atualizando produto ID: {}", user.getEmail(), id);
+
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
+                logger.warn("Produto não encontrado para atualização: ID {}", id);
 
         if (!product.getUser().getId().equals(user.getId())) {
+            logger.warn("Usuário {} tentou atualizar produto ID: {} sem permissão", user.getEmail(), id);
             throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
@@ -115,33 +124,48 @@ public class ProductService {
         // product.setQuantity(dto.quantity());
 
         Product updated = productRepository.save(product);
+        logger.info("Produto atualizado com sucesso: {} (ID: {})", updated.getName(), updated.getId());
         return mapToResponseDTO(updated);
     }
 
     // 5. Deletar produto
     public void deleteProduct(Long id) {
         User user = getAuthenticatedUser();
+        logger.info("Usuário {} deletando produto ID: {}", user.getEmail(), id);
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> {
+                    logger.warn("Produto não encontrado para deleção: ID {}", id);
+                    return new ProductNotFoundException(id);
+                });
 
         if (!product.getUser().getId().equals(user.getId())) {
+            logger.warn("Usuário {} tentou deletar produto ID: {} sem permissão", user.getEmail(), id);
             throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
         productRepository.delete(product);
+        logger.info("Produto deletado com sucesso: {} (ID: {})", product.getName(), product.getId());
     }
 
     // 6. REGRA DE NEGÓCIO: ENTRADA DE ESTOQUE (adicionar quantidade)
     public ProductResponseDTO addStock(Long id, Integer quantityToAdd) {
         if (quantityToAdd <= 0) {
+            logger.warn("Tentativa de adicionar quantidade inválida: {}", quantityToAdd);
             throw new RuntimeException("Quantidade a adicionar deve ser positiva");
         }
 
         User user = getAuthenticatedUser();
+        logger.info("Usuário {} adicionando {} unidades ao produto ID: {}", user.getEmail(), quantityToAdd, id);
+        
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> {
+                    logger.warn("Produto não encontrado para adicionar estoque: ID {}", id);
+                    return new ProductNotFoundException(id);
+                });
 
         if (!product.getUser().getId().equals(user.getId())) {
+            logger.warn("Usuário {} Tentou alterar estoque do produto ID: {} sem permissão", user.getEmail(), id);
             throw new UnauthorizedProductAccessException(id, user.getId());
         }
         // Guarda a quantidade anterior antes de atualizar o estoque, para fins de registro da movimentação
@@ -156,45 +180,45 @@ public class ProductService {
             updated,
             MovimentationType.ENTRY,
             previousQuantity,
-             updated.getQuantity()
+            updated.getQuantity()
         );
         
+        logger.info("Estoque atualizado: produto {} - antes: {}, depois: {}", product.getName(), previousQuantity, updated.getQuantity());
         return mapToResponseDTO(updated);
     }
 
     // 7. REGRA DE NEGÓCIO: SAÍDA DE ESTOQUE (remover quantidade)
-    public ProductResponseDTO removeStock(Long id, Integer quantityToRemove) {
+        public ProductResponseDTO removeStock(Long id, Integer quantityToRemove) {
         if (quantityToRemove <= 0) {
-            throw new RuntimeException("Quantidade a remover deve ser positiva");
+            logger.warn("Tentativa de remover quantidade inválida: {}", quantityToRemove);
+            throw new IllegalArgumentException("Quantidade a remover deve ser positiva");
         }
 
         User user = getAuthenticatedUser();
+        logger.info("Usuário {} removendo {} unidades do produto ID: {}", user.getEmail(), quantityToRemove, id);
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> {
+                    logger.warn("Produto não encontrado para saída de estoque: {}", id);
+                    return new ProductNotFoundException(id);
+                });
 
         if (!product.getUser().getId().equals(user.getId())) {
+            logger.warn("Usuário {} tentou alterar estoque do produto ID: {} sem permissão", user.getEmail(), id);
             throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
-        // Regra de negócio crítica: não permitir estoque negativo
         if (product.getQuantity() < quantityToRemove) {
-            throw new RuntimeException("Estoque insuficiente! Disponível: " + product.getQuantity());
+            logger.warn("Estoque insuficiente: produto {} - disponível: {}, solicitado: {}", product.getName(), product.getQuantity(), quantityToRemove);
+            throw new IllegalArgumentException("Estoque insuficiente! Disponível: " + product.getQuantity());
         }
-        // Guarda a quantidade anterior antes de atualizar o estoque, para fins de registro da movimentação
-        Integer previousQuantity = product.getQuantity();
 
-        // Atualiza a quantidade do produto
+        Integer previousQuantity = product.getQuantity();
         product.setQuantity(product.getQuantity() - quantityToRemove);
         Product updated = productRepository.save(product);
 
-        // Registra a movimentação (EXIT)
-        movimentationService.registerMovimentation(
-            updated,
-            MovimentationType.EXIT,
-            previousQuantity,
-            updated.getQuantity()
-        );
-
+        movimentationService.registerMovimentation(updated, MovimentationType.EXIT, previousQuantity, updated.getQuantity());
+        logger.info("Estoque atualizado: produto {} - antes: {}, depois: {}", product.getName(), previousQuantity, updated.getQuantity());
         return mapToResponseDTO(updated);
     }
 

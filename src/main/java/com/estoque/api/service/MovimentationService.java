@@ -7,16 +7,20 @@ import com.estoque.api.model.Product;
 import com.estoque.api.model.User;
 import com.estoque.api.repository.MovimentationRepository;
 import com.estoque.api.repository.UserRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class MovimentationService {
 
     private final MovimentationRepository movimentationRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(MovimentationService.class);
 
     public MovimentationService(MovimentationRepository movimentationRepository,
                                 UserRepository userRepository) {
@@ -43,6 +47,8 @@ public class MovimentationService {
         movimentation.setCurrentQuantity(newQuantity);
         
         movimentationRepository.save(movimentation);
+        logger.info("Movimentação registrada: {} do produto {} ({}) - Quantidade: {}", 
+        type, product.getName(), product.getId(), Math.abs(newQuantity - previousQuantity));
     }
 
     public Page<MovimentationResponseDTO> listUserMovimentations(Pageable pageable) {
