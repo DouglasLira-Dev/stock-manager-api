@@ -8,6 +8,10 @@ import com.estoque.api.model.Product;
 import com.estoque.api.model.User;
 import com.estoque.api.repository.ProductRepository;
 import com.estoque.api.repository.UserRepository;
+import com.estoque.api.exception.ProductNotFoundException;
+import com.estoque.api.exception.UnauthorizedProductAccessException;
+import com.estoque.api.exception.UserNotFoundException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +41,7 @@ public class ProductService {
     private User getAuthenticatedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     // 1. Criar produto
@@ -82,10 +86,10 @@ public class ProductService {
     public ProductResponseDTO getProductById(Long id) {
         User user = getAuthenticatedUser();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         if (!product.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não tem permissão para acessar este produto");
+            throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
         return mapToResponseDTO(product);
@@ -95,10 +99,10 @@ public class ProductService {
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
         User user = getAuthenticatedUser();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         if (!product.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não tem permissão para editar este produto");
+            throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
         product.setName(dto.name());
@@ -118,10 +122,10 @@ public class ProductService {
     public void deleteProduct(Long id) {
         User user = getAuthenticatedUser();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         if (!product.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não tem permissão para deletar este produto");
+            throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
         productRepository.delete(product);
@@ -135,10 +139,10 @@ public class ProductService {
 
         User user = getAuthenticatedUser();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         if (!product.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não tem permissão para alterar este produto");
+            throw new UnauthorizedProductAccessException(id, user.getId());
         }
         // Guarda a quantidade anterior antes de atualizar o estoque, para fins de registro da movimentação
         Integer previousQuantity = product.getQuantity();
@@ -166,10 +170,10 @@ public class ProductService {
 
         User user = getAuthenticatedUser();
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         if (!product.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Você não tem permissão para alterar este produto");
+            throw new UnauthorizedProductAccessException(id, user.getId());
         }
 
         // Regra de negócio crítica: não permitir estoque negativo
