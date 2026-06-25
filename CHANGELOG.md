@@ -6,6 +6,43 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [3.1.0] - 2026-06-22
+
+### ✨ Adicionado
+- GitHub Actions para construir imagem Docker automaticamente
+- Workflow `docker-build.yml` com build e artefato
+- Badge de build status no README
+
+---
+
+## [3.0.0] - 2026-06-22
+
+### ✨ Adicionado
+- Migração de SQLite para PostgreSQL
+- Flyway para versionamento do banco de dados
+- Dockerfile para containerização da aplicação
+- docker-compose.yml com PostgreSQL e app
+- application-docker.properties para ambiente Docker
+- Suporte a arquitetura ARM64
+
+### 🔧 Alterado
+- Atualização do Flyway para suporte ao PostgreSQL 17
+- Configuração de ambiente para Docker
+
+---
+
+### Atualizar versão `[2.1.0]`
+**Onde:** Na linha `[2.1.0] - 2026-06-22`
+
+**Adicionar:**
+```markdown
+### 🔧 Corrigido
+- Exceções customizadas com códigos de erro
+- Respostas de erro padronizadas (ErrorResponse)
+- Logs com SLF4J em todos os Services
+
+---
+
 ## [2.1.0] - 2026-06-22
 
 ### ✨ Adicionado

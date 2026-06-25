@@ -48,6 +48,24 @@ mvn test
 
 ```
 ---
+
+## 🐳 Docker
+
+O projeto suporta execução via Docker:
+
+```bash
+# Construir a imagem
+docker build -t stock-manager-api:latest .
+
+# Subir os containers
+docker-compose up -d
+
+# Parar os containers
+docker-compose down
+
+A imagem também é construída automaticamente pelo GitHub Actions a cada push na branch main.
+
+---
 ## 📝 Documentação
 Atualize o READM.md se necessário.
 ---

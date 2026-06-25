@@ -12,6 +12,9 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/DouglasLira-Dev/stock-manager-api?style=flat-square)](https://github.com/DouglasLira-Dev/stock-manager-api/commits/main)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-20%20passed-brightgreen?style=flat-square)](#)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/features/actions)
+[![Build Docker Image](https://github.com/DouglasLira-Dev/stock-manager-api/actions/workflows/docker-build.yml/badge.svg)](https://github.com/DouglasLira-Dev/stock-manager-api/actions/workflows/docker-build.yml)
 
 </div>
 
@@ -59,7 +62,7 @@ API REST para controle de inventário/estoque, desenvolvida como projeto de port
 | Categoria | Tecnologias |
 | :--- | :--- |
 | **Back-end** | Java 17, Spring Boot 3.4.4, Spring Security 6 |
-| **Banco de Dados** | SQLite, Hibernate (JPA), Spring Data JPA |
+| **Banco de Dados** | PostgreSQL, Flyway, Hibernate (JPA), Spring Data JPA |
 | **Autenticação** | JWT (jjwt 0.12.6) |
 | **Documentação** | SpringDoc OpenAPI (Swagger UI) |
 | **Monitoramento** | Spring Boot Actuator |
@@ -97,6 +100,7 @@ src/
 ### Pré-requisitos
 - JDK 17 ou 21
 - Maven 3.9+
+- Docker e Docker Compose (para execução dos containers)
 
 ### Passos
 
@@ -110,8 +114,21 @@ cd stock-manager-api
 # Compile e execute
 mvn clean spring-boot:run
 
-#A aplicação estará disponível em http://localhost:8080.
+# A aplicação estará disponível em http://localhost:8080
+---
+### 🐳 Executar com Docker
 
+```bash
+# Clone o repositório
+git clone https://github.com/DouglasLira-Dev/stock-manager-api.git
+cd stock-manager-api
+
+# Subir os containers
+docker-compose up -d
+
+#A aplicação estará disponível em http://localhost:8080.
+A imagem Docker também é construída automaticamente pelo GitHub Actions a cada push na branch main. 
+---
 ## Executar os Testes
 
 ```bash

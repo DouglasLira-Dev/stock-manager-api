@@ -4,6 +4,8 @@
 
 | Versão | Suportada |
 | :--- | :--- |
+| 3.1.x | ✅ |
+| 3.0.x | ✅ |
 | 2.1.x | ✅ |
 | 1.x.x | ❌ |
 
@@ -35,3 +37,6 @@ Entre em contato diretamente:
 - ✅ Validação de entrada
 - ✅ Tratamento de exceções
 - ✅ Dependências atualizadas
+- ✅ Exceções customizadas com códigos de erro
+- ✅ Respostas de erro padronizadas (ErrorResponse)
+- ✅ Logs estruturados para auditoria
