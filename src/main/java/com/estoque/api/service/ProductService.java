@@ -8,6 +8,7 @@ import com.estoque.api.model.Product;
 import com.estoque.api.model.User;
 import com.estoque.api.repository.ProductRepository;
 import com.estoque.api.repository.UserRepository;
+import com.estoque.api.exception.InsufficientStockException;
 import com.estoque.api.exception.ProductNotFoundException;
 import com.estoque.api.exception.UnauthorizedProductAccessException;
 import com.estoque.api.exception.UserNotFoundException;
@@ -191,6 +192,7 @@ public class ProductService {
 
     // 7. REGRA DE NEGÓCIO: SAÍDA DE ESTOQUE (remover quantidade)
         public ProductResponseDTO removeStock(Long id, Integer quantityToRemove) {
+
         if (quantityToRemove <= 0) {
             logger.warn("Tentativa de remover quantidade inválida: {}", quantityToRemove);
             throw new IllegalArgumentException("Quantidade a remover deve ser positiva");
@@ -212,7 +214,7 @@ public class ProductService {
 
         if (product.getQuantity() < quantityToRemove) {
             logger.warn("Estoque insuficiente: produto {} - disponível: {}, solicitado: {}", product.getName(), product.getQuantity(), quantityToRemove);
-            throw new IllegalArgumentException("Estoque insuficiente! Disponível: " + product.getQuantity());
+            throw new InsufficientStockException(product.getId(), product.getQuantity(), quantityToRemove);
         }
 
         Integer previousQuantity = product.getQuantity();
