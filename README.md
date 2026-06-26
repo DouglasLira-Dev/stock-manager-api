@@ -193,19 +193,25 @@ A interface permite:
 
 ## 🧪 Testes
 
-O projeto conta com **20 testes unitários**:
+O projeto conta com **21 testes**:
+
+### 🧪 Testes Unitários (20 testes)
 
 | Classe de Teste | Quantidade | Cenários |
 |------------------|------------|----------|
 | `AuthServiceTest` | 5 testes | Registro, login, validações |
 | `ProductServiceTest` | 15 testes | CRUD, regras de estoque, filtros, estatísticas, históricos |
 
-```bash
-# Executar todos os testes
-mvn test
+### 🐳 Testes de Integração (1 teste)
+
+| Classe de Teste | Tecnologia | Cenários |
+|------------------|------------|----------|
+| `AuthIntegrationTest` | Testcontainers + PostgreSQL | Registro e login com banco real em container |
+
+> **Diferencial:** O teste de integração usa **Testcontainers** para rodar um banco PostgreSQL real em container, garantindo que a API funciona com o banco de produção.
 
 ```bash
-# Executar todos os testes
+# Executar todos os testes (unitários + integração)
 mvn test
 ```
 

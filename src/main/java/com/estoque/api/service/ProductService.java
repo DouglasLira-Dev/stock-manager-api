@@ -153,39 +153,28 @@ public class ProductService {
 
     // 6. REGRA DE NEGÓCIO: ENTRADA DE ESTOQUE (adicionar quantidade)
     public ProductResponseDTO addStock(Long id, Integer quantityToAdd) {
-        if (quantityToAdd <= 0) {
-            logger.warn("Tentativa de adicionar quantidade inválida: {}", quantityToAdd);
-            throw new RuntimeException("Quantidade a adicionar deve ser positiva");
-        }
-
+    // A validação @Positive no DTO já garante que quantityToAdd > 0
+    // Não precisa de validação manual aqui
+    
         User user = getAuthenticatedUser();
         logger.info("Usuário {} adicionando {} unidades ao produto ID: {}", user.getEmail(), quantityToAdd, id);
-        
+
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> {
-                    logger.warn("Produto não encontrado para adicionar estoque: ID {}", id);
+                    logger.warn("Produto não encontrado para entrada de estoque: {}", id);
                     return new ProductNotFoundException(id);
                 });
 
         if (!product.getUser().getId().equals(user.getId())) {
-            logger.warn("Usuário {} Tentou alterar estoque do produto ID: {} sem permissão", user.getEmail(), id);
+            logger.warn("Usuário {} tentou alterar estoque do produto ID: {} sem permissão", user.getEmail(), id);
             throw new UnauthorizedProductAccessException(id, user.getId());
         }
-        // Guarda a quantidade anterior antes de atualizar o estoque, para fins de registro da movimentação
-        Integer previousQuantity = product.getQuantity();
 
-        // Atualiza a quantidade do produto
+        Integer previousQuantity = product.getQuantity();
         product.setQuantity(product.getQuantity() + quantityToAdd);
         Product updated = productRepository.save(product);
 
-        // Registra a movimentação (ENTRY)
-        movimentationService.registerMovimentation(
-            updated,
-            MovimentationType.ENTRY,
-            previousQuantity,
-            updated.getQuantity()
-        );
-        
+        movimentationService.registerMovimentation(updated, MovimentationType.ENTRY, previousQuantity, updated.getQuantity());
         logger.info("Estoque atualizado: produto {} - antes: {}, depois: {}", product.getName(), previousQuantity, updated.getQuantity());
         return mapToResponseDTO(updated);
     }
