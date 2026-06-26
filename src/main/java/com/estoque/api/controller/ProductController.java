@@ -3,6 +3,7 @@ package com.estoque.api.controller;
 import com.estoque.api.dto.ProductRequestDTO;
 import com.estoque.api.dto.ProductResponseDTO;
 import com.estoque.api.dto.ProductStatsDTO;
+import com.estoque.api.dto.StockUpdateDTO;
 import com.estoque.api.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -63,21 +64,21 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6. ENTRADA DE ESTOQUE (adicionar quantidade)
+    // 6. ENTRADA DE ESTOQUE
     @PatchMapping("/{id}/stock/add")
     public ResponseEntity<ProductResponseDTO> addStock(
             @PathVariable Long id,
-            @RequestParam Integer quantity) {
-        ProductResponseDTO response = productService.addStock(id, quantity);
+            @Valid @RequestBody StockUpdateDTO dto) {
+        ProductResponseDTO response = productService.addStock(id, dto.quantity());
         return ResponseEntity.ok(response);
     }
 
-    // 7. SAÍDA DE ESTOQUE (remover quantidade) - com validação
+    // 7. SAÍDA DE ESTOQUE
     @PatchMapping("/{id}/stock/remove")
     public ResponseEntity<ProductResponseDTO> removeStock(
             @PathVariable Long id,
-            @RequestParam Integer quantity) {
-        ProductResponseDTO response = productService.removeStock(id, quantity);
+            @Valid @RequestBody StockUpdateDTO dto) {
+        ProductResponseDTO response = productService.removeStock(id, dto.quantity());
         return ResponseEntity.ok(response);
     }
 
