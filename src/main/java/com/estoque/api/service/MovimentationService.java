@@ -12,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +54,20 @@ public class MovimentationService {
         type, product.getName(), product.getId(), Math.abs(newQuantity - previousQuantity));
     }
 
-    public Page<MovimentationResponseDTO> listUserMovimentations(Pageable pageable) {
+    public Page<MovimentationResponseDTO> listUserMovimentations(MovimentationType type, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         User user = getAuthenticatedUser();
-        Page<Movimentation> movimentations = movimentationRepository.findByUserId(user.getId(), pageable);
+        Page<Movimentation> movimentations;
+
+            if (type != null && from != null && to != null) {
+                movimentations = movimentationRepository.findByUserIdAndTypeAndCreatedAtBetween(user.getId(), type, from, to, pageable);
+            } else if (type != null) {
+                movimentations = movimentationRepository.findByUserIdAndType(user.getId(), type, pageable);
+            } else if (from != null && to != null) {
+                movimentations = movimentationRepository.findByUserIdAndCreatedAtBetween(user.getId(), from, to, pageable);
+            } else {
+                movimentations = movimentationRepository.findByUserId(user.getId(), pageable);
+            }
+
         return movimentations.map(this::mapToResponseDTO);
     }
 
