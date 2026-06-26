@@ -106,8 +106,10 @@ public class ProductService {
         logger.info("Usuário {} atualizando produto ID: {}", user.getEmail(), id);
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
-                logger.warn("Produto não encontrado para atualização: ID {}", id);
+                .orElseThrow(() -> {
+                    logger.warn("Produto não encontrado para atualização: ID {}", id);
+                    return new ProductNotFoundException(id);
+                });
 
         if (!product.getUser().getId().equals(user.getId())) {
             logger.warn("Usuário {} tentou atualizar produto ID: {} sem permissão", user.getEmail(), id);

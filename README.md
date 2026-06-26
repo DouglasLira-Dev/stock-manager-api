@@ -5,9 +5,9 @@
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=java&logoColor=white)](https://adoptium.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.4-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)](https://jwt.io/)
-[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://swagger.io/)
-
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Flyway](https://img.shields.io/badge/Flyway-CC0000?style=for-the-badge&logo=flyway&logoColor=white)](https://flywaydb.org/)
 [![GitHub release](https://img.shields.io/github/v/release/DouglasLira-Dev/stock-manager-api?style=flat-square)](https://github.com/DouglasLira-Dev/stock-manager-api/releases)
 [![GitHub last commit](https://img.shields.io/github/last-commit/DouglasLira-Dev/stock-manager-api?style=flat-square)](https://github.com/DouglasLira-Dev/stock-manager-api/commits/main)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
